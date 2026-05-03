@@ -125,7 +125,12 @@ public unsafe class LightController : IDisposable
         });
 
         var boneModelPos = Vector3.Transform(new Vector3(boneTransform->Translation.X, boneTransform->Translation.Y, boneTransform->Translation.Z), playerModelMatrix);
-        boneModelPos.Y += 0.18f; // target position is above the hand naturally
+
+        // Offset the light from the bone for more natural shadows. Fine-tuned through in-game testing with various races and heights.
+        var forwardOffsetVector = new Vector3(0.23f, -0.6f, 0.02f);
+        var boneRotation = baseRotation * new Quaternion(boneTransform->Rotation.X, boneTransform->Rotation.Y, boneTransform->Rotation.Z, boneTransform->Rotation.W);
+        var rotatedOffset = Vector3.Transform(forwardOffsetVector, boneRotation);
+        boneModelPos += rotatedOffset;
 
         lightPtr->RenderLight->Transform->Position = boneModelPos;
         lightPtr->UpdateCulling();
