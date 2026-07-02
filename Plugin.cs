@@ -1,3 +1,15 @@
+﻿#:sdk Dalamud.NET.Sdk@15.0.0
+#:property Version=1.0.1
+#:property Author=YF
+#:property Name=RealTorch
+#:property Description=Makes the torch accessory put out light.
+#:property Punchline=Set the world alight!
+#:property InternalName=RealTorch
+#:property Tags=torch;light;accessory;roleplay
+#:property PackageLicenseExpression=AGPL-3.0-or-later
+#:property OutputType=Library
+
+using Dalamud.Plugin;
 using System;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
@@ -6,10 +18,43 @@ using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Common.Math;
+using Dalamud.IoC;
 
 using Light = FFXIVClientStructs.FFXIV.Client.Graphics.Scene.Light;
 
 namespace Plugin;
+
+// ReSharper disable once ClassNeverInstantiated.Global - instantiated by Dalamud
+public sealed partial class Plugin : IDalamudPlugin
+{
+    public Plugin(IDalamudPluginInterface pluginInterface)
+    {
+        pluginInterface.Create<S>();
+
+        LC = new LightController();
+    }
+    public LightController LC { get; init; }
+
+    public void Dispose()
+    {
+        LC.Dispose();
+    }
+}
+
+public class S
+{
+    [PluginService]
+    internal static IFramework Framework { get; private set; } = null!;
+
+    [PluginService]
+    internal static IPluginLog Log { get; private set; } = null!;
+
+    [PluginService]
+    internal static ICondition Condition { get; private set; } = null!;
+
+    [PluginService]
+    internal static IObjectTable ObjectTable { get; private set; } = null!;
+}
 
 public unsafe class LightController : IDisposable
 {
@@ -154,3 +199,4 @@ public unsafe class LightController : IDisposable
         return mat;
     }
 }
+
